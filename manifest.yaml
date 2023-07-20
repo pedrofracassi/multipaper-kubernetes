@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multipaper-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multipaper-master
+  template:
+    metadata:
+      labels:
+        app: multipaper-master
+    spec:
+      containers:
+        - name: multipaper-master
+          image: pedrofracassi/multipaper-master
+          ports:
+            - containerPort: 35353
+            - containerPort: 25565
+          resources:
+            requests:
+              cpu: 1
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: multipaper-proxy
+spec:
+  type: LoadBalancer
+  selector:
+    app: multipaper-master
+  ports:
+    - protocol: TCP
+      name: minecraft
+      port: 25565
+      targetPort: 25565
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: multipaper-master
+spec:
+  selector:
+    app: multipaper-master
+  ports:
+    - protocol: TCP
+      name: multipaper
+      port: 35353
+      targetPort: 35353
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multipaper-node
+spec:
+  selector:
+    matchLabels:
+      app: multipaper-node
+  template:
+    metadata:
+      labels:
+        app: multipaper-node
+    spec:
+      containers:
+        - name: multipaper-node
+          image: pedrofracassi/multipaper-node
+          env:
+            - name: MULTIPAPER_MASTER_ADDRESS
+              value: "multipaper-master:35353"
+          ports:
+            - containerPort: 25565
+          resources:
+            requests:
+              cpu: 1
+              memory: 2Gi
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: multipaper-node-autoscaler
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: multipaper-node
+  minReplicas: 1
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80

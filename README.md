@@ -1,6 +1,6 @@
 # Multipaper Kubernetes
 
-Proof-of-concept Kubernetes setup for running a MultiPaper Minecraft Server that autoscales based on CPU usage. Not production-ready, but it works! :D
+Proof-of-concept Kubernetes setup for running a MultiPaper Minecraft Server that autoscales based on CPU usage. Not production-ready, but it works! **Pull Requests are more than welcome!**
 
 ## Setup
 
@@ -8,8 +8,8 @@ Clone the repository and run `kubectl apply -f .` in the root directory. This wi
 
 ## To-do list
 
-[ ] Persistent volume claim for world storage
-[ ] GitHub Actions image build
-[x] Download multipaper jar on build
-[x] Copy plugins to node docker image
-[x] Advertise the correct IP to the master
+- [ ] Persistent volume claim for world storage
+- [ ] GitHub Actions image build
+- [x] Download multipaper jar on build
+- [x] Copy plugins to node docker image
+- [x] Advertise the correct IP to the master
